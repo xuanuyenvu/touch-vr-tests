@@ -26,7 +26,7 @@ public class PushAnimation : MonoBehaviour
         fbbik = GetComponent<FullBodyBipedIK>();
     }
 
-    void Update()
+    void LateUpdate()
     {
         float finalWeight = 0f;
         if (isPushing)
