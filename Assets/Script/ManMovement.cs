@@ -8,6 +8,7 @@ public class ManMovement : MonoBehaviour
 
     private Animator animator;
     private GameObject player;
+    public GameObject rotateTarget;
     private NavMeshAgent agent;
 
     void Start()
@@ -26,22 +27,28 @@ public class ManMovement : MonoBehaviour
 
             if (HasReachedDestination())
             {
-                Debug.Log("Reached the player!");
-                isMovingToTarget = false;
                 animator.SetBool("isPunch", true);
+                isMovingToTarget = false;
             }
         }
         else
         {
+            agent.ResetPath();
             animator.SetFloat("speed", 0);
         }
 
         if (animator.GetBool("isPunch") &&
-            animator.GetCurrentAnimatorStateInfo(0).IsName("Punch") &&
+            (animator.GetCurrentAnimatorStateInfo(0).IsName("punch") || animator.GetCurrentAnimatorStateInfo(0).IsName("moveForward")) &&
             animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1f)
         {
             animator.SetBool("isPunch", false);
         }
+        
+        if (animator.GetCurrentAnimatorStateInfo(0).IsName("moveForward"))
+        {
+            transform.position += transform.forward * (1f * Time.deltaTime);
+        }
+
     }
 
     private bool HasReachedDestination()
