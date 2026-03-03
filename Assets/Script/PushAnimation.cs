@@ -28,6 +28,7 @@ public class PushAnimation : MonoBehaviour
 
     private PushState currentState = PushState.Idle;
     public bool useTarget;
+    public bool useRotation;
 
     void Start()
     {
@@ -39,6 +40,7 @@ public class PushAnimation : MonoBehaviour
     }
 
     public bool isResetting;
+    public float offsetCurve;
 
     void Update()
     {
@@ -116,8 +118,9 @@ public class PushAnimation : MonoBehaviour
         {
             // RotateManTowardsTarget();
             // aimIK.enabled = true;
-            // LookAtTargetSmooth(rightHandTarget, 5f);
-            float weight = blendCurve.Evaluate(state.normalizedTime * 0.8f); 
+            if(useRotation)
+                LookAtTargetSmooth(rightHandTarget, 5f);
+            float weight = blendCurve.Evaluate(state.normalizedTime * offsetCurve); 
             fbbik.solver.rightHandEffector.positionWeight = weight;
             // fbbik.solver.rightHandEffector.rotationWeight = weight;
             fbbik.solver.rightHandEffector.target = rightHandTarget;
@@ -125,7 +128,7 @@ public class PushAnimation : MonoBehaviour
         else
         {
             // aimIK.enabled = false;
-            // transform.LookAt(player.transform);
+            transform.LookAt(new Vector3(player.transform.position.x, transform.position.y, player.transform.position.z));
             fbbik.solver.rightHandEffector.positionWeight = 0f;
             fbbik.solver.rightHandEffector.rotationWeight = 0f;
         }
@@ -143,8 +146,7 @@ public class PushAnimation : MonoBehaviour
 
         Quaternion lookRot = Quaternion.LookRotation(dir);
 
-        // 🔥 Tạo offset 90 độ quanh trục Y
-        Quaternion offset = Quaternion.Euler(0f, 90f, 0f);
+        Quaternion offset = Quaternion.Euler(0f, -5f, 0f);
 
         Quaternion targetRot = lookRot * offset;
 
