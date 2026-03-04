@@ -5,7 +5,6 @@ using Unity.XR.CoreUtils;
 public class PushAnimation : MonoBehaviour
 {
     private FullBodyBipedIK fbbik;
-    private Vector3 originalPosition;
     [SerializeField] private AnimationCurve pushCurve;
     [SerializeField] private AnimationCurve returnCurve;
     [SerializeField] private AnimationCurve blendCurve;
@@ -25,27 +24,13 @@ public class PushAnimation : MonoBehaviour
     {
         fbbik = GetComponent<FullBodyBipedIK>();
         animator = GetComponent<Animator>();
-        originalPosition = transform.position;
+        
         player = GameObject.FindGameObjectWithTag("Player");
         lookAtIK = GetComponent<LookAtIK>();
     }
 
     public bool isResetting;
     public float offsetCurve;
-
-    void Update()
-    {
-        if(isResetting)
-        {
-            ResetPosition();
-            isResetting = false;
-        }
-    }
-
-    private void ResetPosition()
-    {
-        transform.position = originalPosition;
-    }
 
     void LateUpdate()
     {
@@ -58,7 +43,9 @@ public class PushAnimation : MonoBehaviour
         if (state.IsName("punch"))
         {
             if(useRotation)
+            {
                 LookAtTargetSmooth(rightHandTarget, 5f);
+            }
             float weight = blendCurve.Evaluate(state.normalizedTime * offsetCurve); 
             fbbik.solver.rightHandEffector.positionWeight = weight;
             fbbik.solver.rightHandEffector.target = rightHandTarget;
@@ -78,7 +65,6 @@ public class PushAnimation : MonoBehaviour
 
     void LookAtTargetSmooth(Transform target, float rotateSpeed)
     {
-        Debug.Log("Looking");
         Vector3 dir = target.position - transform.position;
         dir.y = 0f;
 
