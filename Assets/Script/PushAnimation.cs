@@ -17,16 +17,7 @@ public class PushAnimation : MonoBehaviour
     private LookAtIK lookAtIK;
 
     private Animator animator;
-    private float t = 0f;
 
-    private enum PushState
-    {
-        Idle,
-        Pushing,
-        Returning
-    }
-
-    private PushState currentState = PushState.Idle;
     public bool useTarget;
     public bool useRotation;
 
@@ -44,62 +35,12 @@ public class PushAnimation : MonoBehaviour
 
     void Update()
     {
-        // if (animator.GetCurrentAnimatorStateInfo(0).IsName("Punch"))
-        // {
-        //     PunchAnimation();
-        // }
         if(isResetting)
         {
             ResetPosition();
             isResetting = false;
         }
     }
-
-    // void LateUpdate()
-    // {
-    //     if (!animator.GetCurrentAnimatorStateInfo(0).IsName("Punch")) return;
-
-    //     float finalWeight = 0f;
-    //     if (isPushing)
-    //     {
-    //         currentState = PushState.Pushing;
-    //         isPushing = false; 
-    //     }
-    //     switch (currentState)
-    //     {
-    //         case PushState.Pushing:
-    //             t += Time.deltaTime * blendSpeed;
-    //             finalWeight = pushCurve.Evaluate(t);
-
-    //             if (t >= 1f)
-    //             {
-    //                 t = 1f;
-    //                 currentState = PushState.Returning; 
-    //             }
-    //             break;
-
-    //         case PushState.Returning:
-    //             t -= Time.deltaTime * blendSpeed;
-    //             finalWeight = returnCurve.Evaluate(1 - t);
-
-    //             if (t <= 0f)
-    //             {
-    //                 t = 0f;
-    //                 currentState = PushState.Idle; 
-    //             }
-    //             break;
-    //     }
-
-    //     fbbik.solver.rightHandEffector.positionWeight = finalWeight;
-    //     fbbik.solver.rightHandEffector.target = rightHandTarget;
-    // }
-
-    // private void PunchAnimation()
-    // {
-    //     Debug.Log("Punch animation triggered");
-    //     fbbik.solver.rightHandEffector.positionWeight = 1f;
-    //     fbbik.solver.rightHandEffector.target = rightHandTarget;
-    // }
 
     private void ResetPosition()
     {
@@ -116,19 +57,18 @@ public class PushAnimation : MonoBehaviour
 
         if (state.IsName("punch"))
         {
-            // RotateManTowardsTarget();
-            // aimIK.enabled = true;
             if(useRotation)
                 LookAtTargetSmooth(rightHandTarget, 5f);
             float weight = blendCurve.Evaluate(state.normalizedTime * offsetCurve); 
             fbbik.solver.rightHandEffector.positionWeight = weight;
-            // fbbik.solver.rightHandEffector.rotationWeight = weight;
             fbbik.solver.rightHandEffector.target = rightHandTarget;
         }
         else
         {
-            // aimIK.enabled = false;
-            transform.LookAt(new Vector3(player.transform.position.x, transform.position.y, player.transform.position.z));
+            if(state.IsName("idle"))
+            {
+                transform.LookAt(new Vector3(player.transform.position.x, transform.position.y, player.transform.position.z));
+            }
             fbbik.solver.rightHandEffector.positionWeight = 0f;
             fbbik.solver.rightHandEffector.rotationWeight = 0f;
         }
