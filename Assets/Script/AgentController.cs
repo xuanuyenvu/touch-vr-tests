@@ -2,7 +2,7 @@ using RootMotion.FinalIK;
 using RootMotion.Demos;
 using UnityEngine;
 
-public class CaseManager : MonoBehaviour
+public class AgentController : MonoBehaviour
 {
     private GameObject agent;
     private ManMovement manMovement;
@@ -14,17 +14,24 @@ public class CaseManager : MonoBehaviour
     private Vector3 originalPosition;
     private Vector3 originalRotation;
 
-    private enum Case
+    public enum Mode
     {
         Animation_and_FBBIK,
         FBBIK_and_InteractionSystem
     }
 
-    [SerializeField] private Case currentCase;
+    public enum TouchType
+    {
+        Punch,
+        HandPush,
+        FingerPush
+    }
 
-    private Case previousCase;
+    [SerializeField] private Mode mode;
+    [SerializeField] private TouchType touchType;
 
-    
+
+
     [ContextMenu("Reset Transform")]
     public void ResetTransform()
     {
@@ -35,7 +42,7 @@ public class CaseManager : MonoBehaviour
     void Awake()
     {
         agent = GameObject.FindGameObjectWithTag("Agent");
-        
+
         manMovement = agent.GetComponent<ManMovement>();
         pushAnimation = agent.GetComponent<PushAnimation>();
         lookAtIK = agent.GetComponent<LookAtIK>();
@@ -55,11 +62,12 @@ public class CaseManager : MonoBehaviour
 
     private void OnValidate()
     {
-        if (previousCase != currentCase)
-        {
-            previousCase = currentCase;
-            HandleCaseChange();
-        }
+        HandleCaseChange();
+    }
+
+    public void Move()
+    {
+
     }
 
     private void HandleCaseChange()
@@ -67,9 +75,9 @@ public class CaseManager : MonoBehaviour
         if (manMovement == null || pushAnimation == null || lookAtIK == null)
             return;
 
-        switch (currentCase)
+        switch (mode)
         {
-            case Case.Animation_and_FBBIK:
+            case Mode.Animation_and_FBBIK:
                 manMovement.enabled = true;
                 pushAnimation.enabled = true;
                 lookAtIK.enabled = true;
@@ -79,11 +87,11 @@ public class CaseManager : MonoBehaviour
 
                 break;
 
-            case Case.FBBIK_and_InteractionSystem:
+            case Mode.FBBIK_and_InteractionSystem:
                 manMovement.enabled = false;
                 pushAnimation.enabled = false;
                 lookAtIK.enabled = false;
-                
+
                 interactionSystem.enabled = true;
                 interactionSystemTestGUI.enabled = true;
                 break;

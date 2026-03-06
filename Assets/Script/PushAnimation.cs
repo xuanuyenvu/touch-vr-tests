@@ -52,7 +52,7 @@ public class PushAnimation : MonoBehaviour
         }
         else
         {
-            if(state.IsName("idle"))
+            if(state.IsName("walking"))
             {
                 transform.LookAt(new Vector3(player.transform.position.x, transform.position.y, player.transform.position.z));
             }
